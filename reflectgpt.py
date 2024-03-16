@@ -127,7 +127,7 @@ def generate_with_reflection(initial_prompt, interrupt_token_count):
 
 def generate_answer():
     try:
-        request_data = "Giant redwoods - the world's largest trees - are flourishing in the UK and now even outnumber those found in their native range in California." # input("Input the question: ")
+        request_data = "Explain the importance of Giant redwoods - the world's largest trees - in the UK and why they outnumber those found in their native range in California." # input("Input the question: ")
         initial_prompt = request_data
         if not initial_prompt:
             return ({"error": "Prompt is required."}), 400
