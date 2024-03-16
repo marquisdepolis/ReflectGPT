@@ -1,0 +1,6 @@
+{
+    "name": "Reflective GPT",
+    "GPT_3.5": "gpt-3.5-turbo-1106",
+    "GPT_4": "gpt-4-turbo-preview",
+    "CLAUDE": "claude-3-opus-20240229"
+}
