@@ -1,4 +1,3 @@
-# %%
 import os
 import json
 import openai
@@ -51,7 +50,7 @@ def llm_call(input, GPT):
             question = f"Considering the reply so far to the prompt, {chunk}, see if its a truly great answer. It needs to be perfect. Once you have thought this, give no actual feedback back to the user. Answer only with a single world saying STOP if it's good and we can stop, CONTINUE if we need to keep generating the answer, or RESTART if it's incorrect and you need to restart the answer from the beginning."
             responsejson = llm_call_json(question, GPT3)
             decision = extract_decision(responsejson).strip().upper()
-            print(f"Decision is: {decision}")
+            print(f"\nDecision is: {decision}")
             if "CONTINUE" in decision:
                 continue
             elif "STOP" in decision:
@@ -61,7 +60,7 @@ def llm_call(input, GPT):
                 generate_answer()
                 break
 
-    final_answer = " ".join(collected_messages)  # Compile the final answer from collected messages
+    final_answer = " ".join(collected_messages)  # Compile the final answer 
     print(f"Final answer: {final_answer}")
     try:
         response.response.close()
@@ -91,7 +90,7 @@ def extract_decision(response):
     """
     try:
         parsed_response = json.loads(response)
-        print(f"\nParsed response is: {parsed_response}\n")
+        # print(f"\nParsed response is: {parsed_response}\n")
         if isinstance(parsed_response, dict):
             # Iterate through each key-value pair in the dictionary
             for key, value in parsed_response.items():
@@ -106,7 +105,7 @@ def extract_decision(response):
                 
                 # Check if the value is one of the decision keywords
                 if isinstance(normalized_value, str) and normalized_value in ['CONTINUE', 'STOP', 'RESTART']:
-                    print(f"Extracted decision based on value: {normalized_value}")
+                    # print(f"Extracted decision based on value: {normalized_value}")
                     return normalized_value.lower()
             
             # If no matching key or value is found, raise an exception
