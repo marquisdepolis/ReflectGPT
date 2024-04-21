@@ -5,6 +5,7 @@ from openai import OpenAI
 from anthropic import Anthropic
 from dotenv import load_dotenv
 load_dotenv()
+from groq import Groq
 from utils.retry import retry_except
 # from tenacity import retry, stop_after_attempt, wait_fixed
 
@@ -48,7 +49,8 @@ def llm_call(input, GPT):
         print(f"Answer so far: {sentence}")
         if len(collected_messages)>= interrupt_token_count:
             question = f"Considering the reply so far to the prompt, {chunk}, see if its a truly great answer. It needs to be perfect. Once you have thought this, give no actual feedback back to the user. Answer only with a single world saying STOP if it's good and we can stop, CONTINUE if we need to keep generating the answer, or RESTART if it's incorrect and you need to restart the answer from the beginning."
-            responsejson = llm_call_json(question, GPT3)
+            # responsejson = llm_call_json(question, GPT3)
+            responsejson = llm_call_groq(question)
             decision = extract_decision(responsejson).strip().upper()
             print(f"\nDecision is: {decision}")
             if "CONTINUE" in decision:
@@ -68,6 +70,26 @@ def llm_call(input, GPT):
         print(f"Error closing the stream: {e}")
 
     return response.choices[0].message.content
+
+@retry_except(exceptions_to_catch=(IndexError, ZeroDivisionError), tries=3, delay=2)
+def llm_call_groq(input):
+    client = Groq()
+    completion = client.chat.completions.create(
+    model="llama3-70b-8192",
+    messages=[
+        {
+            "role": "user",
+            "content": f"Considering the reply so far to the prompt, {input}, see if its a truly great answer. It needs to be perfect. Once you have thought this, give no actual feedback back to the user. Answer only with a single world saying STOP if it's good and we can stop, CONTINUE if we need to keep generating the answer, or RESTART if it's incorrect and you need to restart the answer from the beginning. Reply with a well formatted JSON."
+        }
+    ],
+    temperature=1,
+    max_tokens=1024,
+    top_p=1,
+    stream=False,
+    response_format={"type": "json_object"},
+    stop=None,
+    )
+    return (completion.choices[0].message.content)
 
 @retry_except(exceptions_to_catch=(IndexError, ZeroDivisionError), tries=3, delay=2)
 def llm_call_json(input, GPT):
